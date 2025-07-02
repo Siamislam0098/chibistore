@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHIBISTORE - Minecraft Product Details</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* CSS Variables for theming - Must match the main store page */
+        :root {
+            --bg-color: #000;
+            --text-color: #fff;
+            --header-bg: #000;
+            --card-bg: #1a1a1a;
+            --gray-text: #9ca3af;
+            --red-accent: #ef4444;
+            --yellow-star: #facc15;
+            --shadow-color-light: rgba(0, 0, 0, 0.1);
+            --shadow-color-dark: rgba(0, 0, 0, 0.06);
+            --hover-shadow-color-light: rgba(0, 0, 0, 0.3);
+            --hover-shadow-color-dark: rgba(0, 0, 0, 0.15);
+            --scroll-button-bg: rgba(0, 0, 0, 0.6);
+            --scroll-button-hover-bg: rgba(0, 0, 0, 0.8);
+        }
+
+        body.light-theme {
+            --bg-color: #f3f4f6; /* Light gray background */
+            --text-color: #1f2937; /* Dark gray text */
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --gray-text: #6b7280;
+            --red-accent: #dc2626; /* Slightly darker red for contrast */
+            --yellow-star: #f59e0b; /* Orange-yellow for stars */
+            --shadow-color-light: rgba(0, 0, 0, 0.05);
+            --shadow-color-dark: rgba(0, 0, 0, 0.02);
+            --hover-shadow-color-light: rgba(0, 0, 0, 0.1);
+            --hover-shadow-color-dark: rgba(0, 0, 0, 0.05);
+            --scroll-button-bg: rgba(255, 255, 255, 0.7);
+            --scroll-button-hover-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        header {
+            background-color: var(--header-bg);
+            transition: background-color 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body.light-theme header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .logo-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        .logo-text span {
+            color: var(--red-accent);
+        }
+        .price-old {
+            text-decoration: line-through;
+            color: var(--gray-text);
+        }
+        .price-new {
+            color: var(--red-accent);
+            font-weight: 600;
+        }
+        .fa-star, .fa-star-half-alt {
+            color: var(--yellow-star);
+        }
+        .add-to-cart-btn {
+            background-color: var(--red-accent);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #dc2626; /* Slightly darker red on hover */
+            transform: translateY(-1px);
+        }
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+        .quantity-control button {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--gray-text);
+            border-radius: 0.375rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .quantity-control button:hover {
+            background-color: var(--scroll-button-hover-bg);
+            border-color: var(--red-accent);
+        }
+        .quantity-control input {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--gray-text);
+            border-radius: 0.375rem;
+            text-align: center;
+            width: 4rem;
+            height: 2.5rem;
+        }
+        .quantity-control input::-webkit-outer-spin-button,
+        .quantity-control input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quantity-control input:focus {
+            outline: none;
+            border-color: var(--red-accent);
+            box-shadow: 0 0 0 2px rgba(var(--red-accent-rgb), 0.5);
+        }
+        /* Define red-accent-rgb for rgba usage */
+        :root {
+            --red-accent-rgb: 239, 68, 68; /* RGB values for #ef4444 */
+        }
+        body.light-theme {
+            --red-accent-rgb: 220, 38, 38; /* RGB values for #dc2626 */
+        }
+        .section-heading {
+            font-size: 1.75rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            margin-bottom: 1.5rem; /* mb-6 */
+            text-align: center;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--red-accent);
+            border-radius: 1.5px;
+        }
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+        }
+        .info-card h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-card ul li {
+            margin-bottom: 0.5rem;
+            color: var(--gray-text);
+        }
+        .info-card ul li strong {
+            color: var(--text-color);
+        }
+
+        /* Hamburger Menu Icon Styling */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 28px; /* Slightly wider */
+            height: 20px; /* Slightly taller */
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px; /* Thicker lines */
+            background-color: var(--text-color);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.open span:nth-child(1) {
+            transform: translateY(8.5px) rotate(45deg); /* Adjusted for new height */
+        }
+
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open span:nth-child(3) {
+            transform: translateY(-8.5px) rotate(-45deg); /* Adjusted for new height */
+        }
+
+        /* Dropdown Menu Styling */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%; /* Position below the toggle button */
+            right: 0;
+            background-color: var(--card-bg); /* Use card-bg for consistency */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            padding: 0.5rem 0;
+            min-width: 160px; /* Minimum width for dropdown */
+            z-index: 50;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            transform: translateY(10px);
+            opacity: 0;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+        .dropdown-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all; /* Allow interaction when open */
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover {
+            background-color: var(--scroll-button-hover-bg); /* Use a subtle hover for dropdown items */
+        }
+        body.light-theme .dropdown-menu a {
+            color: var(--text-color);
+        }
+
+        /* Search Bar Container Styling */
+        .search-bar-container {
+            position: absolute;
+            top: 100%; /* Position below the toggle button */
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            padding: 0.75rem;
+            width: 280px; /* Fixed width when shown */
+            opacity: 0; /* Hidden by default */
+            pointer-events: none; /* Not interactive when hidden */
+        }
+        .search-bar-container.open {
+            opacity: 1; /* Fully visible when open */
+            pointer-events: all; /* Interactive when open */
+        }
+        .search-bar-container input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            background-color: var(--bg-color); /* Use background color for input */
+            color: var(--text-color);
+            border: 1px solid var(--gray-text);
+            transition: border-color 0.2s ease;
+        }
+        .search-bar-container input:focus {
+            outline: none;
+            border-color: var(--red-accent);
+            box-shadow: 0 0 0 2px rgba(var(--red-accent-rgb), 0.5); /* Add a focus ring */
+        }
+        /* Define red-accent-rgb for rgba usage */
+        :root {
+            --red-accent-rgb: 239, 68, 68; /* RGB values for #ef4444 */
+        }
+        body.light-theme {
+            --red-accent-rgb: 220, 38, 38; /* RGB values for #dc2626 */
+        }
+
+        /* Autocomplete Suggestions Styling */
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            z-index: 51; /* Higher than search bar container */
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 0.25rem;
+        }
+        .autocomplete-suggestions div {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: background-color 0.2s ease;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: var(--scroll-button-hover-bg);
+        }
+
+        /* Overlay for blurring background */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            backdrop-filter: blur(5px); /* Blur effect */
+            z-index: 40; /* Below mobile menu, above main content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: none; /* Not interactive when hidden */
+        }
+
+        #overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all; /* Interactive when active */
+        }
+
+        /* Mobile Navigation (originally hidden by default, now controlled by opacity/visibility) */
+        #mobile-menu {
+            background-color: var(--card-bg);
+            transition: background-color 0.3s ease, transform 0.3s ease-out, opacity 0.3s ease, visibility 0.3s ease;
+            transform: translateX(-100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 70%;
+            padding-top: 4rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            z-index: 45; /* Higher than overlay */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Not interactive when hidden */
+            display: flex; /* Ensure it's flex for column layout */
+            flex-direction: column;
+            space-y: 6; /* Tailwind class, might need to be margin-top for direct CSS */
+            padding-top: 2rem; /* Adjusted for better spacing */
+            padding-bottom: 2rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all; /* Interactive when open */
+        }
+        #mobile-menu a {
+            margin-bottom: 1.5rem; /* Equivalent to space-y-6 */
+        }
+
+
+        /* Disable scrolling on body when menu is open */
+        body.no-scroll {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header (Copied from game-store-page) -->
+    <header class="py-4 px-6 flex items-center justify-between sticky top-0 z-50">
+        <!-- Left: Hamburger (mobile) + Logo -->
+        <div class="flex items-center space-x-4">
+            <button id="menu-toggle" class="md:hidden">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="logo-text">
+                CHIBI<span class="text-red-500">STORE</span>
+            </div>
+        </div>
+
+        <!-- Middle: Desktop Navigation Links (Hidden on product detail page) -->
+        <nav class="hidden md:flex flex-grow justify-center space-x-6">
+            <a href="#home" class="text-lg font-medium hover:text-red-500 transition-colors hidden" style="color: var(--text-color);">Home</a>
+            <a href="#shop" class="text-lg font-medium hover:text-red-500 transition-colors hidden" style="color: var(--text-color);">Shop</a>
+            <a href="#categories" class="text-lg font-medium hover:text-red-500 transition-colors hidden" style="color: var(--text-color);">Categories</a>
+            <a href="#contact" class="text-lg font-medium hover:text-red-500 transition-colors hidden" style="color: var(--text-color);">Contact</a>
+        </nav>
+
+        <!-- Right: Search, Theme, Cart, Profile Dropdown -->
+        <div class="flex items-center space-x-4">
+            <!-- Search Icon/Bar (Desktop Only) -->
+            <div class="relative hidden md:block">
+                <button id="search-toggle" class="text-2xl" style="color: var(--text-color);">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div id="search-bar-container" class="search-bar-container">
+                    <input type="text" id="desktop-search-input" placeholder="Search games..." class="focus:outline-none focus:ring-2">
+                    <div id="desktop-autocomplete-suggestions" class="autocomplete-suggestions hidden"></div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="text-2xl" style="color: var(--text-color);">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <!-- Shopping Cart -->
+            <a href="#cart" class="text-2xl relative" style="color: var(--text-color);">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+            </a>
+
+            <!-- Profile Dropdown -->
+            <div class="relative">
+                <button id="profile-toggle" class="text-2xl" style="color: var(--text-color);">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div id="profile-dropdown-menu" class="dropdown-menu">
+                    <a href="#profile">My Profile</a>
+                    <a href="#settings">Settings</a>
+                    <a href="#logout" class="text-red-500">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation (controlled by opacity/visibility) -->
+    <nav id="mobile-menu"><br><br><br>
+        <a href="#home" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Home</a>
+        <a href="#shop" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Shop</a>
+        <a href="#categories" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Categories</a>
+        <a href="#contact" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Contact</a>
+        <a href="#profile" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">My Profile</a>
+        <a href="#settings" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Settings</a>
+        <a href="#logout" class="block text-xl font-medium hover:text-red-500 transition-colors text-red-500" style="color: var(--red-accent);">Logout</a>
+    </nav>
+
+    <!-- Overlay for blurring background -->
+    <div id="overlay"></div>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Back to Store link, now below the consistent header -->
+        <div class="mb-6">
+            <a href="index.html" class="text-xl hover:text-red-500 transition-colors" style="color: var(--text-color);">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Store
+            </a>
+        </div>
+
+        <div id="product-detail-content" class="bg-card-bg rounded-xl shadow-lg p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-8" style="background-color: var(--card-bg);">
+            <!-- Product Image Section -->
+            <div class="w-full md:w-1/2 lg:w-2/5 flex justify-center items-center">
+                <img id="product-image" src="https://placehold.co/600x800/000000/FFFFFF?text=Product+Image" alt="Product Image" class="rounded-lg w-full h-auto max-w-md md:max-w-full object-cover">
+            </div>
+
+            <!-- Product Details Section -->
+            <div class="w-full md:w-1/2 lg:w-3/5 text-center md:text-left">
+                <p id="product-category" class="text-sm uppercase tracking-widest mb-2" style="color: var(--gray-text);">CATEGORY</p>
+                <h1 id="product-name" class="text-3xl md:text-4xl font-bold mb-4" style="color: var(--text-color);">Product Name</h1>
+
+                <div class="flex items-center justify-center md:justify-start mb-4">
+                    <div id="product-rating" class="flex items-center mr-2">
+                        <!-- Stars will be dynamically generated here -->
+                    </div>
+                    <span id="review-count" class="text-sm" style="color: var(--gray-text);">(0 Reviews)</span>
+                </div>
+
+                <div class="text-2xl md:text-3xl font-semibold mb-6">
+                    <span id="product-old-price" class="price-old mr-3"></span>
+                    <span id="product-new-price" class="price-new"></span>
+                </div>
+
+                <p id="product-description" class="text-base leading-relaxed mb-8" style="color: var(--gray-text);">
+                    This is a detailed description of the product. It highlights key features, benefits, and any other relevant information that a customer might need before making a purchase. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
+                    <div class="flex items-center quantity-control">
+                        <button id="decrease-quantity" class="px-3 py-1 rounded-l-md"><i class="fas fa-minus"></i></button>
+                        <input type="number" id="product-quantity" value="1" min="1" class="w-16 text-center border-y-2 border-gray-700 focus:border-red-500">
+                        <button id="increase-quantity" class="px-3 py-1 rounded-r-md"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <button class="add-to-cart-btn flex items-center justify-center">
+                        <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About This Game Section -->
+        <section id="about-this-game-section" class="mt-12">
+            <h2 class="section-heading" style="color: var(--text-color);">About This Game</h2>
+            <div class="info-card" style="background-color: var(--card-bg);">
+                <p class="text-base leading-relaxed" style="color: var(--gray-text);">
+                    This section will contain detailed information about the game, its story, gameplay mechanics, and unique features. For Grand Theft Auto V, this would describe the open-world environment, the three playable protagonists (Michael, Franklin, and Trevor), the heists, and the vibrant city of Los Santos.
+                    <br><br>
+                    It would also highlight the vast array of activities available, from high-stakes missions to street races, golf, and stock market manipulation. The online component, Grand Theft Auto Online, would also be a key feature discussed here, emphasizing its continuous evolution and community events.
+                </p>
+            </div>
+        </section>
+
+        <!-- System Requirements Section -->
+        <section class="mt-8 mb-12">
+            <h2 class="section-heading" style="color: var(--text-color);">System Requirements</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="minimum-requirements" class="info-card" style="background-color: var(--card-bg);">
+                    <h3>Minimum Requirements</h3>
+                    <ul>
+                        <li><strong>OS:</strong> Windows 7 64 Bit Service Pack 1 or higher</li>
+                        <li><strong>Processor:</strong> Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz</li>
+                        <li><strong>RAM:</strong> 4 GB RAM</li>
+                        <li><strong>Graphics:</strong> NVIDIA 9800 GT 1GB / AMD HD 4870 1GB (DX 10, 10.1, 11)</li>
+                        <li><strong>Storage:</strong> 72 GB available space</li>
+                    </ul>
+                </div>
+                <div id="recommended-requirements" class="info-card" style="background-color: var(--card-bg);">
+                    <h3>Recommended Requirements</h3>
+                    <ul>
+                        <li><strong>OS:</strong> Windows 10 64 Bit</li>
+                        <li><strong>Processor:</strong> Intel Core i5 3470 @ 3.2GHZ (4 CPUs) / AMD X8 FX-8350 @ 4GHZ (8 CPUs)</li>
+                        <li><strong>RAM:</strong> 8 GB RAM</li>
+                        <li><strong>Graphics:</strong> NVIDIA GTX 660 2GB / AMD HD7870 2GB</li>
+                        <li><strong>Storage:</strong> 72 GB SSD available space</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-sm mt-8" style="background-color: var(--header-bg); color: var(--gray-text);">
+        <p>&copy; 2025 CHIBISTORE. All rights reserved.</p>
+        <div class="flex justify-center space-x-4 mt-4">
+            <a href="#" class="hover:text-red-500 transition-colors" style="color: var(--gray-text);"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="hover:text-red-500 transition-colors" style="color: var(--gray-text);"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="hover:text-red-500 transition-colors" style="color: var(--gray-text);"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Sample product data (simulating product.json) - Must be consistent with main store page
+        const products = [
+            { id: 'grand-theft-auto-v', name: 'Grand Theft Auto V Enhanced Edition (PC) - Rockstar Key', category: 'ROCKSTAR GAMES', price: '₹1,289.00', oldPrice: '₹2,499.00', rating: 4.5, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Grand+Theft+Auto+V', description: 'Experience the critically acclaimed Grand Theft Auto V with enhanced visuals and performance. Explore the vast open world of Los Santos and Blaine County, play as three distinct protagonists, and embark on a thrilling adventure filled with crime, action, and humor.' },
+            { id: 'minecraft-java-bedrock', name: 'Minecraft Java & Bedrock Edition (PC) Key', category: 'MINECRAFT', price: '₹1,749.00', oldPrice: '₹1,999.00', rating: 5, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Java+%26+Bedrock', description: 'Get both Minecraft: Java Edition and Minecraft for Windows (Bedrock Edition) in one package! Explore infinite worlds and build everything from the simplest of homes to the grandest of castles. Play in creative mode with unlimited resources or mine deep into the world in survival mode, crafting weapons and armor to fend off dangerous mobs.' },
+            { id: 'minecraft-legends', name: 'Minecraft Legends (PC) Key', category: 'MINECRAFT', price: '₹499.00', oldPrice: '₹2,649.00', rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Legends', description: 'Discover the mysteries of Minecraft Legends, a new action-strategy game. Explore a gentle land of rich resources and lush biomes on the brink of destruction. The piglins’ destructive rampage is spreading across the Overworld, and it’s up to you to inspire your allies and lead them in strategic battles to save the Minecraft world.' },
+            { id: 'minecraft-minecoins', name: 'Minecraft: 330 Minecoins Digital Code', category: 'MINECRAFT', price: '₹249.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Minecoins', description: 'Minecoins are an in-game currency that can be used to purchase skins, texture packs, worlds, and more from the Minecraft Marketplace. Customize your Minecraft experience with new content and show off your unique style!' },
+            { id: 'max-payne-3', name: 'Max Payne 3 Complete Edition - Rockstar Key', category: 'ROCKSTAR GAMES', price: '₹749.00', oldPrice: '₹2,999.00', rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Max+Payne+3', description: 'For Max Payne, the tragedies that took his loved ones years ago are wounds that refuse to heal. No longer a cop, close to washed up and addicted to painkillers, Max takes a job in São Paulo, Brazil, protecting the family of wealthy real estate mogul Rodrigo Branco, in an attempt to finally escape his troubled past.' },
+            { id: 'red-dead-redemption-2', name: 'Red Dead Redemption 2 Standard Edition (PC) - Rockstar Key', category: 'ROCKSTAR GAMES', price: '₹1,599.00', oldPrice: '₹2,999.00', rating: 5, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Red+Dead+Redemption+2', description: 'Winner of over 175 Game of the Year Awards and recipient of over 250 perfect scores, Red Dead Redemption 2 is an epic tale of honor and loyalty at the dawn of the modern age. America, 1899. Arthur Morgan and the Van der Linde gang are outlaws on the run. With federal agents and the best bounty hunters in the nation massing on their heels, the gang must rob, steal and fight their way across the rugged heartland of America in order to survive.' },
+            { id: 'rockstar-game-3', name: 'Another Rockstar Title (PC) Key', category: 'ROCKSTAR GAMES', price: '₹999.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Rockstar+Game+3', description: 'A thrilling new adventure from Rockstar Games, featuring an expansive open world and a gripping storyline. Dive into a world of action, intrigue, and unforgettable characters.' },
+            { id: 'rockstar-game-4', name: 'Yet Another Rockstar Title (PC) Key', category: 'ROCKSTAR GAMES', price: '₹1,499.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Rockstar+Game+4', description: 'Prepare for another masterpiece from Rockstar! This game pushes the boundaries of storytelling and gameplay, offering a unique experience in a beautifully crafted universe.' },
+            { id: 'minecraft-dungeons', name: 'Minecraft Dungeons Hero Edition (PC) Key', category: 'MINECRAFT', price: '₹1,199.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Dungeons', description: 'Fight your way through an all-new action-adventure game, inspired by classic dungeon crawlers and set in the Minecraft universe! Up to four friends can play together, or you can brave the dungeons alone. Battle new-and-nasty mobs in action-packed, treasure-stuffed, wildly varied levels, all in an epic quest to defeat the evil Arch-Illager!' },
+            { id: 'minecraft-story-mode', name: 'Minecraft Story Mode - Season Two (PC) Key', category: 'MINECRAFT', price: '₹399.00', oldPrice: '₹899.00', rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Story+Mode', description: 'Continue the adventure of Jesse and friends in Minecraft: Story Mode - Season Two. With the Old Builders defeated and the world saved, life should be simpler for Jesse, but new challenges and mysteries await in this episodic adventure game.' },
+            { id: 'minecraft-game-3', name: 'Another Minecraft Title (PC) Key', category: 'MINECRAFT', price: '₹799.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Game+3', description: 'Dive into a new Minecraft experience! This title offers fresh gameplay mechanics and a captivating story within the beloved blocky world. Build, explore, and survive like never before.' },
+            { id: 'minecraft-game-4', name: 'Yet Another Minecraft Title (PC) Key', category: 'MINECRAFT', price: '₹649.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/600x800/000000/FFFFFF?text=Minecraft+Game+4', description: 'Expand your Minecraft collection with this exciting new game. Featuring unique challenges and endless possibilities, it\'s a must-have for any Minecraft enthusiast.' },
+        ];
+
+        // JavaScript for mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = menuToggle ? menuToggle.querySelector('.hamburger') : null;
+        const overlay = document.getElementById('overlay');
+        const body = document.body;
+
+        if (menuToggle && mobileMenu && hamburgerIcon && overlay && body) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('open'); // Toggle 'open' class for slide effect
+                hamburgerIcon.classList.toggle('open'); // Toggle 'open' class for hamburger animation
+                overlay.classList.toggle('active'); // Toggle active class for blur effect
+                body.classList.toggle('no-scroll'); // Toggle no-scroll class on body
+            });
+
+            // Close menu when overlay is clicked
+            overlay.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                hamburgerIcon.classList.remove('open');
+                overlay.classList.remove('active');
+                body.classList.remove('no-scroll');
+            });
+        }
+
+        // Theme Changer Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle ? themeToggle.querySelector('i') : null;
+
+        // Function to apply theme
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            } else {
+                body.classList.remove('light-theme');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            }
+        }
+
+        // Check for saved theme preference on load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme('light');
+        }
+
+        // Event listener for theme toggle button
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    applyTheme('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    applyTheme('light');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // Profile Dropdown Logic
+        const profileToggle = document.getElementById('profile-toggle');
+        const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
+
+        if (profileToggle && profileDropdownMenu) {
+            profileToggle.addEventListener('click', (event) => {
+                profileDropdownMenu.classList.toggle('open');
+                event.stopPropagation();
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!profileDropdownMenu.contains(event.target) && !profileToggle.contains(event.target)) {
+                    profileDropdownMenu.classList.remove('open');
+                }
+            });
+        }
+
+        // Search Bar Logic (Desktop)
+        const desktopSearchToggle = document.getElementById('search-toggle');
+        const desktopSearchBarContainer = document.getElementById('search-bar-container');
+        const desktopSearchInput = document.getElementById('desktop-search-input');
+        const desktopAutocompleteSuggestions = document.getElementById('desktop-autocomplete-suggestions');
+
+        if (desktopSearchToggle && desktopSearchBarContainer && desktopSearchInput && desktopAutocompleteSuggestions) {
+            desktopSearchToggle.addEventListener('click', (event) => {
+                if (desktopSearchBarContainer.classList.contains('open')) {
+                    desktopSearchBarContainer.classList.remove('open');
+                    desktopAutocompleteSuggestions.classList.add('hidden');
+                } else {
+                    desktopSearchBarContainer.classList.add('open');
+                    desktopSearchInput.focus();
+                }
+                event.stopPropagation();
+            });
+
+            desktopSearchInput.addEventListener('input', () => {
+                const query = desktopSearchInput.value.toLowerCase();
+                desktopAutocompleteSuggestions.innerHTML = '';
+
+                if (query.length > 0) {
+                    const filteredProducts = products.filter(product =>
+                        product.name.toLowerCase().includes(query)
+                    );
+
+                    if (filteredProducts.length > 0) {
+                        filteredProducts.forEach(product => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.textContent = product.name;
+                            suggestionDiv.addEventListener('click', () => {
+                                window.location.href = `#product-detail-${product.id}`;
+                                desktopSearchInput.value = product.name;
+                                desktopAutocompleteSuggestions.classList.add('hidden');
+                            });
+                            desktopAutocompleteSuggestions.appendChild(suggestionDiv);
+                        });
+                        desktopAutocompleteSuggestions.classList.remove('hidden');
+                    } else {
+                        desktopAutocompleteSuggestions.classList.add('hidden');
+                    }
+                } else {
+                    desktopAutocompleteSuggestions.classList.add('hidden');
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!desktopSearchBarContainer.contains(event.target) && !desktopSearchToggle.contains(event.target)) {
+                    desktopSearchBarContainer.classList.remove('open');
+                    desktopAutocompleteSuggestions.classList.add('hidden');
+                }
+            });
+        }
+
+        // Function to get product ID from URL hash
+        function getProductIdFromHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#product-detail-')) {
+                return hash.substring('#product-detail-'.length);
+            }
+            return null;
+        }
+
+        // Function to display product details
+        function displayProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+
+            if (product) {
+                document.getElementById('product-image').src = product.imageUrl;
+                document.getElementById('product-image').alt = product.name;
+                document.getElementById('product-category').textContent = product.category;
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-description').textContent = product.description;
+
+                // Price display
+                const newPriceElement = document.getElementById('product-new-price');
+                const oldPriceElement = document.getElementById('product-old-price');
+                newPriceElement.textContent = product.price;
+                if (product.oldPrice) {
+                    oldPriceElement.textContent = product.oldPrice;
+                    oldPriceElement.classList.remove('hidden'); // Show old price if available
+                } else {
+                    oldPriceElement.classList.add('hidden'); // Hide if no old price
+                }
+
+                // Rating display
+                const ratingContainer = document.getElementById('product-rating');
+                ratingContainer.innerHTML = ''; // Clear existing stars
+                const fullStars = Math.floor(product.rating);
+                const hasHalfStar = product.rating % 1 !== 0;
+
+                for (let i = 0; i < fullStars; i++) {
+                    const star = document.createElement('i');
+                    star.classList.add('fas', 'fa-star', 'text-sm');
+                    ratingContainer.appendChild(star);
+                }
+                if (hasHalfStar) {
+                    const halfStar = document.createElement('i');
+                    halfStar.classList.add('fas', 'fa-star-half-alt', 'text-sm');
+                    ratingContainer.appendChild(halfStar);
+                }
+                // Add empty stars for remaining
+                const emptyStars = 5 - Math.ceil(product.rating);
+                for (let i = 0; i < emptyStars; i++) {
+                    const emptyStar = document.createElement('i');
+                    emptyStar.classList.add('far', 'fa-star', 'text-sm'); // far for empty star
+                    emptyStar.style.color = 'var(--yellow-star)'; /* Ensure empty stars also use the yellow color */
+                    ratingContainer.appendChild(emptyStar);
+                }
+
+                // Placeholder for review count (could be dynamic in a real app)
+                document.getElementById('review-count').textContent = `(${Math.floor(Math.random() * 100) + 1} Reviews)`;
+
+                // Update "About This Game" and "System Requirements" based on the product
+                updateGameSpecificSections(product.id);
+
+            } else {
+                // Product not found, redirect or show error
+                document.getElementById('product-detail-content').innerHTML = `
+                    <div class="text-center w-full py-16">
+                        <h2 class="text-2xl font-bold mb-4" style="color: var(--text-color);">Product Not Found</h2>
+                        <p style="color: var(--gray-text);">The product you are looking for does not exist.</p>
+                        <a href="#store" class="mt-6 inline-block add-to-cart-btn">Back to Store</a>
+                    </div>
+                `;
+                // Clear game-specific sections if product not found
+                // Ensure these elements exist before trying to set innerHTML
+                const aboutGameParagraph = document.querySelector('#about-this-game-section .info-card p');
+                const minReqsList = document.querySelector('#minimum-requirements ul');
+                const recReqsList = document.querySelector('#recommended-requirements ul');
+
+                if (aboutGameParagraph) aboutGameParagraph.textContent = '';
+                if (minReqsList) minReqsList.innerHTML = '';
+                if (recReqsList) recReqsList.innerHTML = '';
+            }
+        }
+
+        // Function to update game-specific sections
+        function updateGameSpecificSections(productId) {
+            const aboutGameParagraph = document.querySelector('#about-this-game-section .info-card p');
+            const minReqsList = document.querySelector('#minimum-requirements ul');
+            const recReqsList = document.querySelector('#recommended-requirements ul');
+
+            // Clear previous content
+            if (aboutGameParagraph) aboutGameParagraph.innerHTML = '';
+            if (minReqsList) minReqsList.innerHTML = '';
+            if (recReqsList) recReqsList.innerHTML = '';
+
+            if (productId === 'grand-theft-auto-v') {
+                if (aboutGameParagraph) aboutGameParagraph.innerHTML = `
+                    Experience the critically acclaimed Grand Theft Auto V with enhanced visuals and performance. Explore the vast open world of Los Santos and Blaine County, play as three distinct protagonists (Michael, Franklin, and Trevor), and embark on a thrilling adventure filled with crime, action, and humor.
+                    <br><br>
+                    Dive into a vast array of activities, from high-stakes missions to street races, golf, and stock market manipulation. The online component, Grand Theft Auto Online, offers a continuously evolving world with new content, events, and a thriving community.
+                `;
+                if (minReqsList) minReqsList.innerHTML = `
+                    <li><strong>OS:</strong> Windows 7 64 Bit Service Pack 1 or higher</li>
+                    <li><strong>Processor:</strong> Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz</li>
+                    <li><strong>RAM:</strong> 4 GB RAM</li>
+                    <li><strong>Graphics:</strong> NVIDIA 9800 GT 1GB / AMD HD 4870 1GB (DX 10, 10.1, 11)</li>
+                    <li><strong>Storage:</strong> 72 GB available space</li>
+                `;
+                if (recReqsList) recReqsList.innerHTML = `
+                    <li><strong>OS:</strong> Windows 10 64 Bit</li>
+                    <li><strong>Processor:</strong> Intel Core i5 3470 @ 3.2GHZ (4 CPUs) / AMD X8 FX-8350 @ 4GHZ (8 CPUs)</li>
+                    <li><strong>RAM:</strong> 8 GB RAM</li>
+                    <li><strong>Graphics:</strong> NVIDIA GTX 660 2GB / AMD HD7870 2GB</li>
+                    <li><strong>Storage:</strong> 72 GB SSD available space</li>
+                `;
+            } else if (productId === 'minecraft-java-bedrock') {
+                if (aboutGameParagraph) aboutGameParagraph.innerHTML = `
+                    Minecraft is a sandbox video game developed by Mojang Studios. In Minecraft, players explore a blocky, procedurally generated 3D world with virtually infinite terrain, and may discover and extract raw materials, craft tools and items, and construct buildings, earthworks and simple machines. Depending on the game mode, players can fight hostile mobs, as well as cooperate with or compete against other players in the same world.
+                    <br><br>
+                    The game has been critically acclaimed, winning numerous awards and being inducted into the World Video Game Hall of Fame. It is renowned for its creative freedom, endless possibilities, and vibrant community. Whether you want to build towering structures, explore vast caves, or survive against the dangers of the night, Minecraft offers an unparalleled adventure for all ages.
+                `;
+                if (minReqsList) minReqsList.innerHTML = `
+                    <li><strong>OS:</strong> Windows 7 or newer (64-bit)</li>
+                    <li><strong>Processor:</strong> Intel Core i3-3210 3.2 GHz / AMD A8-7600 APU 3.1 GHz or equivalent</li>
+                    <li><strong>RAM:</strong> 4 GB RAM</li>
+                    <li><strong>Graphics:</strong> Integrated: Intel HD Graphics 4000 or AMD Radeon R5 series with OpenGL 4.4 / Discrete: Nvidia GeForce 400 Series or AMD Radeon HD 7000 series with OpenGL 4.4</li>
+                    <li><strong>Storage:</strong> 1 GB available space</li>
+                `;
+                if (recReqsList) recReqsList.innerHTML = `
+                    <li><strong>OS:</strong> Windows 10 or newer (64-bit)</li>
+                    <li><strong>Processor:</strong> Intel Core i5-4690 3.5GHz / AMD A10-7800 APU 3.5 GHz or equivalent</li>
+                    <li><strong>RAM:</strong> 8 GB RAM</li>
+                    <li><strong>Graphics:</strong> Nvidia GeForce 700 Series or AMD Radeon Rx 200 Series with OpenGL 4.5</li>
+                    <li><strong>Storage:</strong> 4 GB SSD available space</li>
+                `;
+            }
+            // Add more else if blocks for other products as needed
+        }
+
+
+        // Quantity control logic
+        const quantityInput = document.getElementById('product-quantity');
+        const decreaseButton = document.getElementById('decrease-quantity');
+        const increaseButton = document.getElementById('increase-quantity');
+
+        if (quantityInput && decreaseButton && increaseButton) {
+            decreaseButton.addEventListener('click', () => {
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
+            });
+
+            increaseButton.addEventListener('click', () => {
+                let currentValue = parseInt(quantityInput.value);
+                quantityInput.value = currentValue + 1;
+            });
+
+            // Ensure input only accepts numbers and min value is 1
+            quantityInput.addEventListener('change', () => {
+                if (parseInt(quantityInput.value) < 1 || isNaN(parseInt(quantityInput.value))) {
+                    quantityInput.value = 1;
+                }
+            });
+        }
+
+        // Initial load of product details based on URL hash or default to Minecraft
+        window.addEventListener('load', () => {
+            const productId = getProductIdFromHash();
+            if (productId) {
+                displayProductDetails(productId);
+            } else {
+                displayProductDetails('minecraft-java-bedrock'); // Default to Minecraft Java & Bedrock Edition
+            }
+        });
+
+        // Listen for hash changes if this page is part of a single-page application flow
+        window.addEventListener('hashchange', () => {
+            const productId = getProductIdFromHash();
+            if (productId) {
+                displayProductDetails(productId);
+            }
+        });
+    </script>
+</body>
+</html>
