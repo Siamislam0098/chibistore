@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHIBISTORE - Store</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* CSS Variables for theming */
+        :root {
+            --bg-color: #000;
+            --text-color: #fff;
+            --header-bg: #000;
+            --card-bg: #1a1a1a;
+            --gray-text: #9ca3af;
+            --red-accent: #ef4444;
+            --yellow-star: #facc15;
+            --shadow-color-light: rgba(0, 0, 0, 0.1);
+            --shadow-color-dark: rgba(0, 0, 0, 0.06);
+            --hover-shadow-color-light: rgba(0, 0, 0, 0.3);
+            --hover-shadow-color-dark: rgba(0, 0, 0, 0.15);
+            --scroll-button-bg: rgba(0, 0, 0, 0.6);
+            --scroll-button-hover-bg: rgba(0, 0, 0, 0.8);
+        }
+
+        body.light-theme {
+            --bg-color: #f3f4f6; /* Light gray background */
+            --text-color: #1f2937; /* Dark gray text */
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --gray-text: #6b7280;
+            --red-accent: #dc2626; /* Slightly darker red for contrast */
+            --yellow-star: #f59e0b; /* Orange-yellow for stars */
+            --shadow-color-light: rgba(0, 0, 0, 0.05);
+            --shadow-color-dark: rgba(0, 0, 0, 0.02);
+            --hover-shadow-color-light: rgba(0, 0, 0, 0.1);
+            --hover-shadow-color-dark: rgba(0, 0, 0, 0.05);
+            --scroll-button-bg: rgba(255, 255, 255, 0.7);
+            --scroll-button-hover-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+        }
+        header {
+            background-color: var(--header-bg);
+            transition: background-color 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for professionalism */
+        }
+        body.light-theme header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        #mobile-menu {
+            background-color: var(--card-bg); /* Use card-bg for consistency */
+            transition: background-color 0.3s ease, transform 0.3s ease-out; /* Smooth transition for mobile menu */
+            transform: translateX(-100%); /* Start off-screen */
+            position: fixed; /* Fixed position */
+            top: 0; /* Align to top */
+            left: 0; /* Align to left */
+            height: 100%; /* Full height */
+            width: 70%; /* Take 70% of screen width */
+            padding-top: 4rem; /* Space for header */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            z-index: 45; /* Below header, above main content */
+        }
+        #mobile-menu.open {
+            transform: translateX(0); /* Slide in */
+        }
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem; /* rounded-xl */
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            height: 420px; /* Adjust this value as needed for desired card height */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease; /* Smooth transition for hover and theme change */
+        }
+        .product-card:hover {
+            transform: translateY(-5px); /* Lift the card slightly on hover */
+            box-shadow: 0 10px 15px -3px var(--hover-shadow-color-light), 0 4px 6px -2px var(--hover-shadow-color-dark); /* More pronounced shadow on hover */
+        }
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 250px; /* Adjust this value to control image area height */
+            overflow: hidden;
+        }
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+        .sale-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background-color: var(--red-accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            z-index: 10;
+        }
+        .heart-icon {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            color: white; /* Always white for visibility */
+            font-size: 1.25rem; /* text-xl */
+            cursor: pointer;
+            z-index: 10;
+        }
+        .price-old {
+            text-decoration: line-through;
+            color: var(--gray-text);
+        }
+        .price-new {
+            color: var(--red-accent);
+            font-weight: 600; /* font-semibold */
+        }
+        .section-title {
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color); /* Ensure title changes color */
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 50px; /* Underline width */
+            height: 2px;
+            background-color: var(--red-accent);
+        }
+        .scroll-button {
+            background-color: var(--scroll-button-bg);
+            color: var(--text-color); /* Button icon color */
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.3s ease;
+        }
+        .scroll-button:hover {
+            background-color: var(--scroll-button-hover-bg);
+        }
+
+        /* Custom styling for the logo text to match the image */
+        .logo-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        .logo-text span {
+            color: var(--red-accent);
+        }
+
+        /* Hero banner styling - now for individual slides */
+        .hero-slide {
+            background-size: cover;
+            background-position: center;
+            height: 200px; /* Adjust height for mobile */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white; /* Text on hero banner remains white for contrast */
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            border-radius: 0.75rem;
+            flex-shrink: 0;
+            width: 100%;
+            scroll-snap-align: start;
+        }
+
+        @media (min-width: 768px) {
+            .hero-slide {
+                height: 300px; /* Adjust height for desktop */
+                font-size: 4rem;
+            }
+        }
+
+        /* Hide scrollbar for carousels */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Ensure product card content aligns to top and takes available space */
+        .product-card .p-4 {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        /* Star rating color */
+        .product-card .fa-star, .product-card .fa-star-half-alt {
+            color: var(--yellow-star);
+        }
+        .text-gray-400 { /* Override Tailwind's direct color for theme compatibility */
+            color: var(--gray-text);
+            transition: color 0.3s ease;
+        }
+        .text-red-500 { /* Override Tailwind's direct color for theme compatibility */
+            color: var(--red-accent);
+            transition: color 0.3s ease;
+        }
+
+        /* Hamburger Menu Icon Styling */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 28px; /* Slightly wider */
+            height: 20px; /* Slightly taller */
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px; /* Thicker lines */
+            background-color: var(--text-color);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.open span:nth-child(1) {
+            transform: translateY(8.5px) rotate(45deg); /* Adjusted for new height */
+        }
+
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open span:nth-child(3) {
+            transform: translateY(-8.5px) rotate(-45deg); /* Adjusted for new height */
+        }
+
+        /* Dropdown Menu Styling */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%; /* Position below the toggle button */
+            right: 0;
+            background-color: var(--card-bg); /* Use card-bg for consistency */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            padding: 0.5rem 0;
+            min-width: 160px; /* Minimum width for dropdown */
+            z-index: 50;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            transform: translateY(10px);
+            opacity: 0;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+        .dropdown-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all; /* Allow interaction when open */
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover {
+            background-color: var(--scroll-button-hover-bg); /* Use a subtle hover for dropdown items */
+        }
+        body.light-theme .dropdown-menu a {
+            color: var(--text-color);
+        }
+
+        /* Search Bar Container Styling */
+        .search-bar-container {
+            position: absolute;
+            top: 100%; /* Position below the toggle button */
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            padding: 0.75rem;
+            width: 280px; /* Adjust width as needed */
+            z-index: 50;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            transform: translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .search-bar-container.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+        .search-bar-container input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            background-color: var(--bg-color); /* Use background color for input */
+            color: var(--text-color);
+            border: 1px solid var(--gray-text);
+            transition: border-color 0.2s ease;
+        }
+        .search-bar-container input:focus {
+            outline: none;
+            border-color: var(--red-accent);
+            box-shadow: 0 0 0 2px rgba(var(--red-accent-rgb), 0.5); /* Add a focus ring */
+        }
+        /* Define red-accent-rgb for rgba usage */
+        :root {
+            --red-accent-rgb: 239, 68, 68; /* RGB values for #ef4444 */
+        }
+        body.light-theme {
+            --red-accent-rgb: 220, 38, 38; /* RGB values for #dc2626 */
+        }
+
+        /* Mobile Search Bar in main content */
+        .mobile-search-section {
+            margin-bottom: 2rem; /* Add some space below the search bar */
+            padding: 0 1rem; /* Horizontal padding for alignment */
+            position: relative; /* For autocomplete positioning */
+        }
+
+        .mobile-search-section input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background-color: var(--card-bg); /* Use card-bg for input */
+            color: var(--text-color);
+            border: 1px solid var(--gray-text);
+            transition: border-color 0.2s ease;
+        }
+        .mobile-search-section input:focus {
+            outline: none;
+            border-color: var(--red-accent);
+            box-shadow: 0 0 0 2px rgba(var(--red-accent-rgb), 0.5);
+        }
+
+        /* Autocomplete Suggestions Styling */
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-light), 0 2px 4px -1px var(--shadow-color-dark);
+            z-index: 51; /* Higher than search bar container */
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 0.25rem;
+        }
+        .autocomplete-suggestions div {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: background-color 0.2s ease;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: var(--scroll-button-hover-bg);
+        }
+
+        /* Overlay for blurring background */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            backdrop-filter: blur(5px); /* Blur effect */
+            z-index: 40; /* Below mobile menu, above main content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Disable scrolling on body when menu is open */
+        body.no-scroll {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="py-4 px-6 flex items-center justify-between sticky top-0 z-50">
+        <!-- Left: Hamburger (mobile) + Logo -->
+        <div class="flex items-center space-x-4">
+            <button id="menu-toggle" class="md:hidden">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="logo-text">
+                CHIBI<span class="text-red-500">STORE</span>
+            </div>
+        </div>
+
+        <!-- Middle: Desktop Navigation Links -->
+        <nav class="hidden md:flex flex-grow justify-center space-x-6">
+            <a href="#home" class="text-lg font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Home</a>
+            <a href="#shop" class="text-lg font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Shop</a>
+            <a href="#categories" class="text-lg font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Categories</a>
+            <a href="#contact" class="text-lg font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Contact</a>
+        </nav>
+
+        <!-- Right: Search, Theme, Cart, Profile Dropdown -->
+        <div class="flex items-center space-x-4">
+            <!-- Search Icon/Bar (Desktop Only) -->
+            <div class="relative hidden md:block">
+                <button id="search-toggle" class="text-2xl" style="color: var(--text-color);">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div id="search-bar-container" class="search-bar-container">
+                    <input type="text" id="desktop-search-input" placeholder="Search games..." class="focus:outline-none focus:ring-2">
+                    <div id="desktop-autocomplete-suggestions" class="autocomplete-suggestions hidden"></div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="text-2xl" style="color: var(--text-color);">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <!-- Shopping Cart -->
+            <a href="#cart" class="text-2xl relative" style="color: var(--text-color);">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+            </a>
+
+            <!-- Profile Dropdown -->
+            <div class="relative">
+                <button id="profile-toggle" class="text-2xl" style="color: var(--text-color);">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div id="profile-dropdown-menu" class="dropdown-menu">
+                    <a href="#profile">My Profile</a>
+                    <a href="#settings">Settings</a>
+                    <a href="#logout" class="text-red-500">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation (hidden by default) -->
+    <nav id="mobile-menu" class="hidden flex-col space-y-6 py-8 px-6"><br>
+        <a href="#home" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Home</a>
+        <a href="#shop" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Shop</a>
+        <a href="#categories" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Categories</a>
+        <a href="#contact" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Contact</a>
+        <a href="#profile" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">My Profile</a>
+        <a href="#settings" class="block text-xl font-medium hover:text-red-500 transition-colors" style="color: var(--text-color);">Settings</a>
+        <a href="#logout" class="block text-xl font-medium hover:text-red-500 transition-colors text-red-500" style="color: var(--red-accent);">Logout</a>
+    </nav>
+
+    <!-- Overlay for blurring background -->
+    <div id="overlay" class="hidden"></div>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- Welcome Banner -->
+        <section class="text-center mb-8">
+            <p class="text-sm uppercase tracking-widest" style="color: var(--gray-text);">Welcome to our store</p>
+        </section>
+
+        <!-- Mobile Search Bar (Visible only on mobile) -->
+        <section class="mobile-search-section md:hidden">
+            <input type="text" id="mobile-search-input" placeholder="Search games..." class="focus:outline-none focus:ring-2">
+            <div id="mobile-autocomplete-suggestions" class="autocomplete-suggestions hidden"></div>
+        </section>
+
+        <!-- Hero Section - Now a Carousel -->
+        <section class="relative mb-12">
+            <div id="hero-carousel" class="flex overflow-x-scroll no-scrollbar snap-x snap-mandatory rounded-xl">
+                <!-- Hero Slide 1 (Palworld inspired) -->
+                <div class="hero-slide" style="background-image: url('https://placehold.co/1200x400/000000/FFFFFF?text=PALWORLD')">
+                    <!-- Content for slide 1 -->
+                </div>
+                <!-- Hero Slide 2 -->
+                <div class="hero-slide" style="background-image: url('https://placehold.co/1200x400/000000/FFFFFF?text=NEW+RELEASES')">
+                    <!-- Content for slide 2 -->
+                </div>
+                <!-- Hero Slide 3 -->
+                <div class="hero-slide" style="background-image: url('https://placehold.co/1200x400/000000/FFFFFF?text=SUMMER+SALE')">
+                    <!-- Content for slide 3 -->
+                </div>
+            </div>
+            <button id="scroll-left-hero" class="scroll-button absolute left-2 top-1/2 -translate-y-1/2"><i class="fas fa-chevron-left"></i></button>
+            <button id="scroll-right-hero" class="scroll-button absolute right-2 top-1/2 -translate-y-1/2"><i class="fas fa-chevron-right"></i></button>
+        </section>
+
+        <!-- Weekly Featured Products Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-8 section-title">WEEKLY FEATURED PRODUCTS</h2>
+            <div class="relative">
+                <div id="featured-products-carousel" class="flex overflow-x-scroll no-scrollbar snap-x snap-mandatory pb-4 -mx-2 md:mx-0">
+                    <!-- Product Card 1 -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-grand-theft-auto-v" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <span class="sale-badge">Sale!</span>
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Grand+Theft+Auto+V" alt="Grand Theft Auto V" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">ROCKSTAR GAMES</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Grand Theft Auto V Enhanced Edition (PC) - Rockstar Key</h3>
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star-half-alt text-xs"></i>
+                                    </div>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-old mr-2">₹2,499.00</span>
+                                        <span class="price-new">₹1,289.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 2 -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="/minecraft.html" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <span class="sale-badge">Sale!</span>
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Java+%26+Bedrock" alt="Minecraft Java & Bedrock Edition" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Minecraft Java & Bedrock Edition (PC) Key</h3>
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                    </div>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-old mr-2">₹1,999.00</span>
+                                        <span class="price-new">₹1,749.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 3 (Minecraft Legends) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-minecraft-legends" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <span class="sale-badge">Sale!</span>
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Legends" alt="Minecraft Legends" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Minecraft Legends (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-old mr-2">₹2,649.00</span>
+                                        <span class="price-new">₹499.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 4 (Minecraft Minecoins) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-minecraft-minecoins" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Minecoins" alt="Minecraft Minecoins" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Minecraft: 330 Minecoins Digital Code</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-new">₹249.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <button id="scroll-left-featured" class="scroll-button absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex"><i class="fas fa-chevron-left"></i></button>
+                <button id="scroll-right-featured" class="scroll-button absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Rockstar Games Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-8 section-title">ROCKSTAR GAMES</h2>
+            <div class="relative">
+                <div id="rockstar-games-carousel" class="flex overflow-x-scroll no-scrollbar snap-x snap-mandatory pb-4 -mx-2 md:mx-0">
+                    <!-- Product Card 1 (Max Payne 3) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-max-payne-3" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <span class="sale-badge">Sale!</span>
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Max+Payne+3" alt="Max Payne 3" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">ROCKSTAR GAMES</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Max Payne 3 Complete Edition - Rockstar Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-old mr-2">₹2,999.00</span>
+                                        <span class="price-new">₹749.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 2 (Red Dead Redemption 2) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-red-dead-redemption-2" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <span class="sale-badge">Sale!</span>
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Red+Dead+Redemption+2" alt="Red Dead Redemption 2" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">ROCKSTAR GAMES</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Red Dead Redemption 2 Standard Edition (PC) - Rockstar Key</h3>
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                    </div>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-old mr-2">₹2,999.00</span>
+                                        <span class="price-new">₹1,599.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 3 (Placeholder) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-rockstar-game-3" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Rockstar+Game+3" alt="Rockstar Game 3" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">ROCKSTAR GAMES</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Another Rockstar Title (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-new">₹999.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 4 (Placeholder) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-rockstar-game-4" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Rockstar+Game+4" alt="Rockstar Game 4" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">ROCKSTAR GAMES</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Yet Another Rockstar Title (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-new">₹1,499.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <button id="scroll-left-rockstar" class="scroll-button absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex"><i class="fas fa-chevron-left"></i></button>
+                <button id="scroll-right-rockstar" class="scroll-button absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Minecraft Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-8 section-title">MINECRAFT</h2>
+            <div class="relative">
+                <div id="minecraft-carousel" class="flex overflow-x-scroll no-scrollbar snap-x snap-mandatory pb-4 -mx-2 md:mx-0">
+                    <!-- Product Card 1 (Minecraft Dungeons) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="/minecraft.html" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Dungeons" alt="Minecraft Dungeons" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Minecraft Dungeons Hero Edition (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-new">₹1,199.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 2 (Minecraft Story Mode) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="/minecraft.html" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <span class="sale-badge">Sale!</span>
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Story+Mode" alt="Minecraft Story Mode" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Minecraft Story Mode - Season Two (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-old mr-2">₹899.00</span>
+                                        <span class="price-new">₹399.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 3 (Minecraft Placeholder) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="/minecraft.html" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Game+3" alt="Minecraft Game 3" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Another Minecraft Title (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-new">₹799.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Product Card 4 (Minecraft Placeholder) -->
+                    <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 px-2 snap-center">
+                        <a href="#product-detail-minecraft-game-4" class="block">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <i class="far fa-heart heart-icon"></i>
+                                    <img src="https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Game+4" alt="Minecraft Game 4" class="product-image">
+                                </div>
+                                <div class="p-4 flex flex-col items-center text-center">
+                                    <p class="text-xs mb-1" style="color: var(--gray-text);">MINECRAFT</p>
+                                    <h3 class="text-sm md:text-base font-medium mb-2" style="color: var(--text-color);">Yet Another Minecraft Title (PC) Key</h3>
+                                    <div class="text-sm md:text-base">
+                                        <span class="price-new">₹649.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <button id="scroll-left-minecraft" class="scroll-button absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex"><i class="fas fa-chevron-left"></i></button>
+                <button id="scroll-right-minecraft" class="scroll-button absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-sm" style="background-color: var(--header-bg); color: var(--gray-text);">
+        <p>&copy; 2025 CHIBISTORE. All rights reserved.</p>
+        <div class="flex justify-center space-x-4 mt-4">
+            <a href="#" class="hover:text-red-500 transition-colors" style="color: var(--gray-text);"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="hover:text-red-500 transition-colors" style="color: var(--gray-text);"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="hover:text-red-500 transition-colors" style="color: var(--gray-text);"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Sample product data (simulating product.json)
+        const products = [
+            { id: 'grand-theft-auto-v', name: 'Grand Theft Auto V Enhanced Edition (PC) - Rockstar Key', category: 'ROCKSTAR GAMES', price: '₹1,289.00', oldPrice: '₹2,499.00', rating: 4.5, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Grand+Theft+Auto+V' },
+            { id: 'minecraft-java-bedrock', name: 'Minecraft Java & Bedrock Edition (PC) Key', category: 'MINECRAFT', price: '₹1,749.00', oldPrice: '₹1,999.00', rating: 5, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Java+%26+Bedrock' },
+            { id: 'minecraft-legends', name: 'Minecraft Legends (PC) Key', category: 'MINECRAFT', price: '₹499.00', oldPrice: '₹2,649.00', rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Legends' },
+            { id: 'minecraft-minecoins', name: 'Minecraft: 330 Minecoins Digital Code', category: 'MINECRAFT', price: '₹249.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Minecoins' },
+            { id: 'max-payne-3', name: 'Max Payne 3 Complete Edition - Rockstar Key', category: 'ROCKSTAR GAMES', price: '₹749.00', oldPrice: '₹2,999.00', rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Max+Payne+3' },
+            { id: 'red-dead-redemption-2', name: 'Red Dead Redemption 2 Standard Edition (PC) - Rockstar Key', category: 'ROCKSTAR GAMES', price: '₹1,599.00', oldPrice: '₹2,999.00', rating: 5, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Red+Dead+Redemption+2' },
+            { id: 'rockstar-game-3', name: 'Another Rockstar Title (PC) Key', category: 'ROCKSTAR GAMES', price: '₹999.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Rockstar+Game+3' },
+            { id: 'rockstar-game-4', name: 'Yet Another Rockstar Title (PC) Key', category: 'ROCKSTAR GAMES', price: '₹1,499.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Rockstar+Game+4' },
+            { id: 'minecraft-dungeons', name: 'Minecraft Dungeons Hero Edition (PC) Key', category: 'MINECRAFT', price: '₹1,199.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Dungeons' },
+            { id: 'minecraft-story-mode', name: 'Minecraft Story Mode - Season Two (PC) Key', category: 'MINECRAFT', price: '₹399.00', oldPrice: '₹899.00', rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Story+Mode' },
+            { id: 'minecraft-game-3', name: 'Another Minecraft Title (PC) Key', category: 'MINECRAFT', price: '₹799.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Game+3' },
+            { id: 'minecraft-game-4', name: 'Yet Another Minecraft Title (PC) Key', category: 'MINECRAFT', price: '₹649.00', oldPrice: null, rating: 0, imageUrl: 'https://placehold.co/400x533/000000/FFFFFF?text=Minecraft+Game+4' },
+        ];
+
+        // JavaScript for mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = menuToggle.querySelector('.hamburger');
+        const overlay = document.getElementById('overlay');
+        const body = document.body; // Get the body element
+
+        if (menuToggle && mobileMenu && hamburgerIcon && overlay && body) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('open'); // Add/remove 'open' class for slide effect
+                hamburgerIcon.classList.toggle('open'); // Toggle 'open' class for hamburger animation
+                overlay.classList.toggle('hidden'); // Toggle visibility of overlay
+                overlay.classList.toggle('active'); // Toggle active class for blur effect
+                body.classList.toggle('no-scroll'); // Toggle no-scroll class on body
+            });
+
+            // Close menu when overlay is clicked
+            overlay.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('open');
+                hamburgerIcon.classList.remove('open');
+                overlay.classList.add('hidden');
+                overlay.classList.remove('active');
+                body.classList.remove('no-scroll');
+            });
+        }
+
+        // JavaScript for horizontal scrolling with buttons
+        function setupCarousel(carouselId, leftButtonId, rightButtonId) {
+            const carousel = document.getElementById(carouselId);
+            const leftButton = document.getElementById(leftButtonId);
+            const rightButton = document.getElementById(rightButtonId);
+
+            if (carousel && leftButton && rightButton) {
+                leftButton.addEventListener('click', () => {
+                    // For hero carousel, scroll by full width to show next slide
+                    if (carouselId === 'hero-carousel') {
+                        carousel.scrollBy({
+                            left: -carousel.offsetWidth, // Scroll left by full width
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // For product carousels, scroll half the carousel width
+                        carousel.scrollBy({
+                            left: -carousel.offsetWidth / 2,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+
+                rightButton.addEventListener('click', () => {
+                    // For hero carousel, scroll by full width to show next slide
+                    if (carouselId === 'hero-carousel') {
+                        carousel.scrollBy({
+                            left: carousel.offsetWidth,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // For product carousels, scroll half the carousel width
+                        carousel.scrollBy({
+                            left: carousel.offsetWidth / 2,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+
+                // Show/hide scroll buttons based on overflow
+                const checkScrollButtons = () => {
+                    if (carousel.scrollWidth > carousel.clientWidth) {
+                        leftButton.classList.remove('hidden');
+                        rightButton.classList.remove('hidden');
+                    } else {
+                        leftButton.classList.add('hidden');
+                        rightButton.classList.add('hidden');
+                    }
+                };
+
+                // Initial check and on resize
+                window.addEventListener('load', checkScrollButtons);
+                window.addEventListener('resize', checkScrollButtons);
+                carousel.addEventListener('scroll', checkScrollButtons); // Re-check on scroll
+            }
+        }
+
+        // Setup carousels
+        setupCarousel('hero-carousel', 'scroll-left-hero', 'scroll-right-hero'); // New hero carousel setup
+        setupCarousel('featured-products-carousel', 'scroll-left-featured', 'scroll-right-featured');
+        setupCarousel('rockstar-games-carousel', 'scroll-left-rockstar', 'scroll-right-rockstar');
+        setupCarousel('minecraft-carousel', 'scroll-left-minecraft', 'scroll-right-minecraft');
+
+        // Toggle heart icon on click
+        document.querySelectorAll('.heart-icon').forEach(icon => {
+            icon.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent navigation if the heart icon is inside an anchor
+                icon.classList.toggle('far'); // outline heart
+                icon.classList.toggle('fas'); // solid heart
+                icon.classList.toggle('text-red-500'); // make it red when filled
+            });
+        });
+
+        // Theme Changer Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        // Function to apply theme
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        // Check for saved theme preference on load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            // Default to light theme if no preference is saved
+            applyTheme('light');
+        }
+
+        // Event listener for theme toggle button
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-theme')) {
+                applyTheme('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                applyTheme('light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Profile Dropdown Logic
+        const profileToggle = document.getElementById('profile-toggle');
+        const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
+
+        if (profileToggle && profileDropdownMenu) {
+            profileToggle.addEventListener('click', (event) => {
+                profileDropdownMenu.classList.toggle('open');
+                event.stopPropagation(); // Prevent click from closing immediately
+            });
+
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!profileDropdownMenu.contains(event.target) && !profileToggle.contains(event.target)) {
+                    profileDropdownMenu.classList.remove('open');
+                }
+            });
+        }
+
+        // Search Bar Logic (Desktop)
+        const desktopSearchToggle = document.getElementById('search-toggle');
+        const desktopSearchBarContainer = document.getElementById('search-bar-container');
+        const desktopSearchInput = document.getElementById('desktop-search-input');
+        const desktopAutocompleteSuggestions = document.getElementById('desktop-autocomplete-suggestions');
+
+        if (desktopSearchToggle && desktopSearchBarContainer && desktopSearchInput && desktopAutocompleteSuggestions) {
+            desktopSearchToggle.addEventListener('click', (event) => {
+                desktopSearchBarContainer.classList.toggle('open');
+                event.stopPropagation(); // Prevent click from closing immediately
+                if (desktopSearchBarContainer.classList.contains('open')) {
+                    desktopSearchInput.focus(); // Focus input when opened
+                } else {
+                    desktopAutocompleteSuggestions.classList.add('hidden'); // Hide suggestions when closing
+                }
+            });
+
+            desktopSearchInput.addEventListener('input', () => {
+                const query = desktopSearchInput.value.toLowerCase();
+                desktopAutocompleteSuggestions.innerHTML = ''; // Clear previous suggestions
+
+                if (query.length > 0) {
+                    const filteredProducts = products.filter(product =>
+                        product.name.toLowerCase().includes(query)
+                    );
+
+                    if (filteredProducts.length > 0) {
+                        filteredProducts.forEach(product => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.textContent = product.name;
+                            suggestionDiv.addEventListener('click', () => {
+                                window.location.href = `#product-detail-${product.id}`;
+                                desktopSearchInput.value = product.name; // Set input value to selected product
+                                desktopAutocompleteSuggestions.classList.add('hidden'); // Hide suggestions
+                            });
+                            desktopAutocompleteSuggestions.appendChild(suggestionDiv);
+                        });
+                        desktopAutocompleteSuggestions.classList.remove('hidden');
+                    } else {
+                        desktopAutocompleteSuggestions.classList.add('hidden');
+                    }
+                } else {
+                    desktopAutocompleteSuggestions.classList.add('hidden');
+                }
+            });
+
+            // Close search bar and suggestions if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!desktopSearchBarContainer.contains(event.target) && !desktopSearchToggle.contains(event.target)) {
+                    desktopSearchBarContainer.classList.remove('open');
+                    desktopAutocompleteSuggestions.classList.add('hidden');
+                }
+            });
+        }
+
+        // Search Bar Logic (Mobile)
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+        const mobileAutocompleteSuggestions = document.getElementById('mobile-autocomplete-suggestions');
+
+        if (mobileSearchInput && mobileAutocompleteSuggestions) {
+            mobileSearchInput.addEventListener('input', () => {
+                const query = mobileSearchInput.value.toLowerCase();
+                mobileAutocompleteSuggestions.innerHTML = ''; // Clear previous suggestions
+
+                if (query.length > 0) {
+                    const filteredProducts = products.filter(product =>
+                        product.name.toLowerCase().includes(query)
+                    );
+
+                    if (filteredProducts.length > 0) {
+                        filteredProducts.forEach(product => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.textContent = product.name;
+                            suggestionDiv.addEventListener('click', () => {
+                                window.location.href = `#product-detail-${product.id}`;
+                                mobileSearchInput.value = product.name; // Set input value to selected product
+                                mobileAutocompleteSuggestions.classList.add('hidden'); // Hide suggestions
+                                mobileMenu.classList.add('hidden'); // Also close mobile menu
+                                hamburgerIcon.classList.remove('open'); // Reset hamburger icon
+                                overlay.classList.add('hidden'); // Hide overlay
+                                overlay.classList.remove('active');
+                                body.classList.remove('no-scroll'); // Re-enable scrolling
+                            });
+                            mobileAutocompleteSuggestions.appendChild(suggestionDiv);
+                        });
+                        mobileAutocompleteSuggestions.classList.remove('hidden');
+                    } else {
+                        mobileAutocompleteSuggestions.classList.add('hidden');
+                    }
+                } else {
+                    mobileAutocompleteSuggestions.classList.add('hidden');
+                }
+            });
+
+            // Close mobile suggestions if clicked outside (within the main content context)
+            document.addEventListener('click', (event) => {
+                if (!mobileSearchInput.contains(event.target) && !mobileAutocompleteSuggestions.contains(event.target)) {
+                    mobileAutocompleteSuggestions.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
